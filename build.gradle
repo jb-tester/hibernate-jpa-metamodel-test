@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.example.spring-multimodule-scanning'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation 'org.hibernate.orm:hibernate-core:6.3.0.Final'
+
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.0.Final'
+    implementation 'org.glassfish:jakarta.el:4.0.2'
+
+    // JPA Metamodel Generator
+    annotationProcessor 'org.hibernate.orm:hibernate-jpamodelgen:6.3.0.Final'
+
+    // database
+    runtimeOnly 'com.mysql:mysql-connector-j:8.1.0'
+
+    // tests
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
