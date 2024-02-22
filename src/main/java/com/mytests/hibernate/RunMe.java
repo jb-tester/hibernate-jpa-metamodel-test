@@ -6,21 +6,14 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.query.Page;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static jakarta.persistence.Persistence.createEntityManagerFactory;
 import static java.lang.System.out;
 
-/**
- * *
- * <p>Created by irina on 9/6/2023.</p>
- * <p>Project: hibernate-63-test</p>
- * *
- */
+
 public class RunMe {
     private static final SessionFactory factory;
 
@@ -51,46 +44,65 @@ public class RunMe {
             out.println(sample);
         }
         out.println("============ metamodel tests: use @SQL:");
-        for (Sample sample : findSamples3("blue","mysample")) {
+        for (Sample sample : findSamples3("blue", "mysample")) {
             out.println(sample);
         }
         out.println("============ metamodel tests: use @Find:");
         for (Sample sample : findSamples2("mysample")) {
             out.println(sample);
         }
-    }
+        out.println("============ metamodel tests: use @Find by id:");
+        out.println(findSamples4(1));
+        out.println("============ metamodel tests: use @Find by version");
+        for (Sample sample : findSamples5(2)) {
+            out.println(sample);
+        }
 
-    static void inSession(EntityManagerFactory factory, Consumer<EntityManager> work) {
-        var entityManager = factory.createEntityManager();
-        var transaction = entityManager.getTransaction();
-        try {
-            transaction.begin();
-            work.accept(entityManager);
-            transaction.commit();
-        }
-        catch (Exception e) {
-            if (transaction.isActive()) transaction.rollback();
-            throw e;
-        }
-        finally {
-            entityManager.close();
-        }
+}
+
+static void inSession(EntityManagerFactory factory, Consumer<EntityManager> work) {
+    var entityManager = factory.createEntityManager();
+    var transaction = entityManager.getTransaction();
+    try {
+        transaction.begin();
+        work.accept(entityManager);
+        transaction.commit();
+    } catch (Exception e) {
+        if (transaction.isActive()) transaction.rollback();
+        throw e;
+    } finally {
+        entityManager.close();
     }
-     // The SampleQueries_ static class will remain unresolved until sources are generated
-    // build the project to make the references resolved
-    static List<Sample> findSamples1(String color) {
-        var samples = factory.fromTransaction(session ->
-                SampleQueries_.findSamplesByColor(session, color));
-        return samples.isEmpty() ? new ArrayList<>() : samples;
-    }
-    static List<Sample> findSamples2(String sample) {
-        var samples = factory.fromTransaction(session ->
-                SampleQueries_.dummyMethodName(session, sample));
-        return samples.isEmpty() ? new ArrayList<>() : samples;
-    }
-    static List<Sample> findSamples3(String color, String sample) {
-        var samples = factory.fromTransaction(session ->
-                SampleQueries_.findSamplesByColorAndSample(session, color, sample));
-        return samples.isEmpty() ? new ArrayList<>() : samples;
-    }
+}
+
+// The SampleQueries_ static class will remain unresolved until sources are generated
+// build the project to make the references resolved
+static List<Sample> findSamples1(String color) {
+    var samples = factory.fromTransaction(session ->
+            SampleQueries_.findSamplesByColor(session, color));
+    return samples.isEmpty() ? new ArrayList<>() : samples;
+}
+
+static List<Sample> findSamples2(String sample) {
+    var samples = factory.fromTransaction(session ->
+            SampleQueries_.dummyMethodName(session, sample));
+    return samples.isEmpty() ? new ArrayList<>() : samples;
+}
+
+static List<Sample> findSamples3(String color, String sample) {
+    var samples = factory.fromTransaction(session ->
+            SampleQueries_.findSamplesByColorAndSample(session, color, sample));
+    return samples.isEmpty() ? new ArrayList<>() : samples;
+}
+
+static Sample findSamples4(Integer id) {
+    var sample = factory.fromTransaction(session ->
+            SampleQueries_.dummyMethodName2(session,id));
+    return (Sample) sample;
+}
+static List<Sample> findSamples5(Integer version) {
+    var samples = factory.fromTransaction(session ->
+            SampleQueries_.dummyMethodName3(session, version));
+    return samples.isEmpty() ? new ArrayList<>() : samples;
+}
 }
