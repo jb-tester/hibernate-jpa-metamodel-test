@@ -21,9 +21,9 @@ public interface SampleQueries {
     List<Sample> dummyMethodName(String sample);
 
     @Find
-    //Sample dummyMethodName2(Integer id); // error should be shown for Integer instead of int
+    //Sample dummyMethodName2(Integer id); // error should be shown for Integer instead of int https://youtrack.jetbrains.com/issue/IDEA-336029
     Sample dummyMethodName2(int id); // error should be shown for Integer instead of int
 
-    // int instead of Integer is ok:
+    // int instead of Integer is ok however:
     @Find List<Sample> dummyMethodName3(int version);
 }
